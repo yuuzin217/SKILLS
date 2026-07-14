@@ -39,10 +39,12 @@ session_summary をインポートして、続きから進めて。
 ### 4. エージェントの手順
 
 1. セッション要約ファイルを検索（優先順位）:
-   - `<workspace>/.gemini/sessions/session_summary_*.md`
+   - `<workspace>/.sessions/session_summary_<YYYY-MM-DD>.md`（1日1ファイル形式）
+   - レガシー: `<workspace>/.sessions/session_summary_<YYYY-MM-DD>_<id>.md`
    - `<workspace>/session_summary.md`
    - アーティファクトディレクトリ内
 2. 要約を読み込み、完了作業・Git 状態・PR 状況を把握
+   - 同日に複数セッションがある場合は、**最後の `## セッション` ブロック**を最新コンテキストとして優先
 3. 「次のステップ」セクションから即座に着手すべきタスクを特定
 4. ユーザーに復元完了を報告し、次のアクションを確認
 

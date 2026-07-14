@@ -34,7 +34,9 @@ Cursor のスキル設定で `session-save/` ディレクトリをスキルと�
 
 ### 3. 出力先
 
-1. `<workspace>/.gemini/sessions/session_summary_<YYYY-MM-DD>_<id>.md`（優先）
+1. `<workspace>/.sessions/session_summary_<YYYY-MM-DD>.md`（優先）
+   - **1日1ファイル**: 同日のファイルが既にあれば、末尾に新しいセッションブロックを追記
+   - 初回保存時のみファイルを新規作成
 2. フォールバック: 会話アーティファクトディレクトリ
 
 ### 4. 要約の構成
@@ -42,17 +44,22 @@ Cursor のスキル設定で `session-save/` ディレクトリをスキルと�
 ```markdown
 # セッション作業要約 (Session Summary - <Date>)
 
-## 1. 完了した作業 (Work Accomplished)
-## 2. 現在のステータス (Current Status)
-## 3. 次のセッションへの引継ぎ事項 (Next Steps)
+## セッション 1 (<HH:MM> / conversation: <id>)
+
+### 1. 完了した作業 (Work Accomplished)
+### 2. 現在のステータス (Current Status)
+### 3. 次のセッションへの引継ぎ事項 (Next Steps)
 ```
+
+同日に2回目以降の保存を行う場合は、`## セッション 2` のように番号付きブロックを追記します。
 
 ### 5. エージェントの手順
 
 1. `git status` / `git diff` で変更を収集
 2. ビルド・テストの結果を確認
-3. 上記フォーマットで要約を生成・保存
-4. 生成ファイルへのリンクをユーザーに提示
+3. 当日の要約ファイルの有無を確認（あれば追記、なければ新規作成）
+4. 上記フォーマットで要約を生成・保存
+5. 生成ファイルへのリンクをユーザーに提示
 
 ## ファイル構成
 
