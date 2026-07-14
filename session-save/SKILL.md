@@ -9,10 +9,11 @@ When a user requests a session summary, a transition plan, or a summary for the 
 
 ## 1. Output Location
 Save the summary to the following location (prioritized):
-1. In the workspace sessions directory: `<workspace_root>/.gemini/sessions/session_summary_<YYYY-MM-DD>_<short-conversation-id>.md`
+1. In the workspace sessions directory: `<workspace_root>/.sessions/session_summary_<YYYY-MM-DD>_<short-conversation-id>.md`
    - Replace `<YYYY-MM-DD>` with the current date (e.g., `2026-06-23`).
    - Replace `<short-conversation-id>` with the first 8 characters of the current conversation ID.
-   - If the directory `<workspace_root>/.gemini/sessions/` does not exist, create it.
+   - If the directory `<workspace_root>/.sessions/` does not exist, create it.
+   - Do **not** write new summaries under `.gemini/sessions/` (legacy path; kept only for load compatibility).
 2. As a fallback, save it as an artifact in the conversation artifacts directory: `<appDataDir>/brain/<conversation-id>/session_summary.md`.
 
 ## 2. Document Structure

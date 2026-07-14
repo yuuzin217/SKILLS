@@ -9,10 +9,12 @@ When the user asks to resume, import, or load the previous session, or when this
 
 ## 1. Locate the Session Summary
 Find the most recent session summary file. Check the following paths in order:
-1. Under the workspace sessions directory: `<workspace_root>/.gemini/sessions/session_summary_*.md`
+1. Under the workspace sessions directory: `<workspace_root>/.sessions/session_summary_*.md`
    - Retrieve all files matching this pattern, and use the one with the latest date in the filename or the latest modification timestamp.
-2. At the workspace root: `<workspace_root>/session_summary.md`
-3. Under the artifacts directory of recent conversations: `<appDataDir>/brain/<previous-conversation-id>/session_summary.md`
+2. Legacy path (backward compatibility): `<workspace_root>/.gemini/sessions/session_summary_*.md`
+   - Use only if no matching file exists under `.sessions/`. Prefer the most recent file by filename date or modification timestamp.
+3. At the workspace root: `<workspace_root>/session_summary.md`
+4. Under the artifacts directory of recent conversations: `<appDataDir>/brain/<previous-conversation-id>/session_summary.md`
 
 If multiple summaries exist, use the one corresponding to the most recent session or with the latest modification timestamp.
 
@@ -23,7 +25,7 @@ If multiple summaries exist, use the one corresponding to the most recent sessio
    - Run `git branch --show-current` to identify the active branch.
    - Run `git status` to check if there are any uncommitted changes or active merges.
    - Check if there are open pull requests using `gh pr list`.
-4. **Clean Up**: Once the summary is successfully read and the context is fully restored, delete the temporary `session_summary.md` file *only if* it was located at the workspace root or temporary locations. Do **not** delete files under `<workspace_root>/.gemini/sessions/` to ensure the session history is preserved.
+4. **Clean Up**: Once the summary is successfully read and the context is fully restored, delete the temporary `session_summary.md` file *only if* it was located at the workspace root or temporary locations. Do **not** delete files under `<workspace_root>/.sessions/` or `<workspace_root>/.gemini/sessions/` to ensure the session history is preserved.
 5. **Identify Next Steps**: Review the "Next Steps" or "引き継ぎ事項" section from the summary to determine the immediate actions to take.
 
 ## 3. Resume the Work
