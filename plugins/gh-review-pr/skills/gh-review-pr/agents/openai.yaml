@@ -1,0 +1,7 @@
+interface:
+  display_name: "GitHub PR Reviewer"
+  short_description: "Initial and follow-up PR reviews with safe comments"
+  default_prompt: "Use $gh-review-pr to review this pull request and prepare evidence-backed comments."
+
+policy:
+  allow_implicit_invocation: true

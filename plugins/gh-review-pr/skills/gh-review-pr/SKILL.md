@@ -7,9 +7,9 @@ description: Review GitHub pull requests on the first pass or after updates, ide
 
 Review a GitHub pull request for correctness, regressions, security, data integrity, performance, concurrency, error handling, test coverage, maintainability, and scope discipline. Support both initial reviews and re-reviews in one workflow.
 
-Prefer the GitHub app from this plugin for repository, pull request, patch, commit, check, and top-level comment data. Use local `git` and `gh` only where the connector cannot provide sufficient context, particularly for current-branch PR discovery, thread-aware review state, exact diff inspection, or local test execution.
+Prefer an available GitHub connector for repository, pull request, patch, commit, check, and top-level comment data. Use local `git` and `gh` only where the active product supports them and the connector cannot provide sufficient context, particularly for current-branch PR discovery, thread-aware review state, exact diff inspection, or local test execution.
 
-Run networked `gh` commands with elevated network access. When CLI access is needed, check `gh auth status` first. If authentication fails, tell the user that GitHub CLI authentication is required and ask them to run `gh auth login`.
+When CLI access is needed, check `gh auth status` first. If authentication fails, tell the user that GitHub CLI authentication is required and ask them to run `gh auth login`. If neither a GitHub connector nor authenticated CLI access is available, identify that exact limitation and do not invent repository state.
 
 ## Review Modes
 
@@ -261,11 +261,11 @@ When there are no findings, do not include empty finding templates. State that n
 
 Use this skill to review code and prepare or submit review feedback.
 
-Route follow-up implementation work to `../gh-address-comments/SKILL.md` when the user wants to address review comments by modifying code.
+When the user wants to modify code in response to review feedback, switch to an available review-comment implementation workflow or edit the code directly only after the user authorizes that separate task.
 
-Route failing GitHub Actions investigation to `../gh-fix-ci/SKILL.md` when diagnosing CI failures becomes the primary task.
+When diagnosing failing GitHub Actions becomes the primary task, switch to an available CI-debugging workflow or inspect checks and logs directly with GitHub CLI where supported.
 
-Route commit, push, and pull-request publication work to `../yeet/SKILL.md`.
+When the user asks to commit, push, or create a pull request, switch to an available Git publishing workflow.
 
 Do not silently expand a review request into code modification. A reviewer can propose a correction, but changing the branch is a separate user-authorized task.
 

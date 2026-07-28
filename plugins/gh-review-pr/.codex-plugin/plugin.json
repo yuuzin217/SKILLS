@@ -1,0 +1,35 @@
+{
+  "name": "gh-review-pr",
+  "version": "1.0.0",
+  "description": "Review GitHub pull requests on the first pass or after updates and prepare evidence-backed feedback.",
+  "author": {
+    "name": "yuuzin217",
+    "url": "https://github.com/yuuzin217"
+  },
+  "homepage": "https://github.com/yuuzin217/SKILLS",
+  "repository": "https://github.com/yuuzin217/SKILLS",
+  "license": "MIT",
+  "keywords": [
+    "github",
+    "pull-request",
+    "code-review",
+    "re-review"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "GitHub PR Reviewer",
+    "shortDescription": "Initial and follow-up PR reviews with safe feedback",
+    "longDescription": "Review a GitHub pull request from scratch or verify fixes after earlier feedback. The workflow prioritizes evidence-backed defects, avoids duplicate comments, and requires confirmation before posting reviews.",
+    "developerName": "yuuzin217",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/yuuzin217/SKILLS",
+    "defaultPrompt": [
+      "Review this pull request and prepare evidence-backed comments",
+      "Re-review this pull request and verify the previous feedback"
+    ]
+  }
+}

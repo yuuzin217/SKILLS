@@ -1,0 +1,20 @@
+{
+  "name": "yuuzin217-skills",
+  "interface": {
+    "displayName": "Yuuzin217 Skills"
+  },
+  "plugins": [
+    {
+      "name": "gh-review-pr",
+      "source": {
+        "source": "local",
+        "path": "./plugins/gh-review-pr"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
