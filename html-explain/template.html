@@ -44,21 +44,24 @@
       gap: 1.5rem;
     }
 
-    @media (min-width: 960px) {
-      .page {
-        grid-template-columns: 14rem minmax(0, var(--measure));
-        align-items: start;
-      }
-    }
-
     .toc {
-      position: sticky;
-      top: 1rem;
       padding: 1rem;
       background: color-mix(in srgb, var(--bg-elevated) 88%, transparent);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       font-size: 0.875rem;
+    }
+
+    @media (min-width: 960px) {
+      .page {
+        grid-template-columns: 14rem minmax(0, var(--measure));
+        align-items: start;
+      }
+
+      .toc {
+        position: sticky;
+        top: 1rem;
+      }
     }
 
     .toc h2 {
@@ -209,7 +212,11 @@
 
     th { background: var(--code-bg); font-weight: 600; }
 
-    .refs code { white-space: nowrap; }
+    .refs code {
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
 
     footer {
       margin-top: 2.5rem;
