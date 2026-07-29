@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><!-- タイトルを入れる --></title>
+  <style>
+    :root {
+      --bg: #f7f6f2;
+      --bg-elevated: #ffffff;
+      --text: #1c1b19;
+      --text-muted: #5c574e;
+      --border: #ddd8ce;
+      --accent: #0f6b5c;
+      --accent-soft: #e6f2ef;
+      --code-bg: #f0eee8;
+      --warn-bg: #f8f1e3;
+      --warn-border: #d4a84b;
+      --font-sans: "IBM Plex Sans JP", "Hiragino Sans", "Noto Sans JP", sans-serif;
+      --font-mono: "IBM Plex Mono", "ui-monospace", "SFMono-Regular", Menlo, Consolas, monospace;
+      --measure: 46rem;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 400px at 10% -10%, #e8f3ef 0%, transparent 55%),
+        linear-gradient(180deg, #fbfaf7 0%, var(--bg) 40%);
+      font-family: var(--font-sans);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    .page {
+      max-width: calc(var(--measure) + 8rem);
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 4rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1.5rem;
+    }
+
+    .toc {
+      padding: 1rem;
+      background: color-mix(in srgb, var(--bg-elevated) 88%, transparent);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+    }
+
+    @media (min-width: 960px) {
+      .page {
+        grid-template-columns: 14rem minmax(0, var(--measure));
+        align-items: start;
+      }
+
+      .toc {
+        position: sticky;
+        top: 1rem;
+      }
+    }
+
+    .toc h2 {
+      margin: 0 0 0.75rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .toc ol {
+      margin: 0;
+      padding-left: 1.1rem;
+      color: var(--text-muted);
+    }
+
+    .toc a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .toc a:hover { color: var(--accent); }
+
+    main {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: calc(var(--radius) + 2px);
+      padding: 2rem 1.5rem;
+      box-shadow: 0 1px 0 rgba(28, 27, 25, 0.03);
+    }
+
+    @media (min-width: 640px) {
+      main { padding: 2.5rem 2.25rem; }
+    }
+
+    header.doc-header {
+      margin-bottom: 2rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .eyebrow {
+      margin: 0 0 0.5rem;
+      color: var(--accent);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    h1 {
+      margin: 0 0 0.75rem;
+      font-size: clamp(1.6rem, 2.5vw, 2rem);
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+    }
+
+    .summary {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+      margin-top: 1rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+
+    section {
+      margin: 2rem 0 0;
+    }
+
+    h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.25rem;
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      margin: 1.5rem 0 0.5rem;
+      font-size: 1.05rem;
+    }
+
+    p { margin: 0 0 1rem; }
+
+    ul, ol { margin: 0 0 1rem; padding-left: 1.25rem; }
+
+    li + li { margin-top: 0.35rem; }
+
+    a { color: var(--accent); }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background: var(--code-bg);
+      padding: 0.1em 0.35em;
+      border-radius: 4px;
+    }
+
+    pre {
+      margin: 0 0 1.25rem;
+      padding: 1rem 1.1rem;
+      overflow-x: auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      line-height: 1.55;
+    }
+
+    pre code {
+      padding: 0;
+      background: transparent;
+      font-size: 0.8125rem;
+    }
+
+    .callout {
+      margin: 0 0 1.25rem;
+      padding: 0.9rem 1rem;
+      background: var(--accent-soft);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+
+    .callout.warn {
+      background: var(--warn-bg);
+      border-left-color: var(--warn-border);
+    }
+
+    .callout p:last-child { margin-bottom: 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 0 1.25rem;
+      font-size: 0.9375rem;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.55rem 0.7rem;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th { background: var(--code-bg); font-weight: 600; }
+
+    .refs code {
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    footer {
+      margin-top: 2.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.8125rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <nav class="toc" aria-label="目次">
+      <h2>目次</h2>
+      <ol>
+        <li><a href="#scope">前提 / スコープ</a></li>
+        <li><a href="#overview">全体像</a></li>
+        <li><a href="#details">詳細</a></li>
+        <li><a href="#tradeoffs">トレードオフ</a></li>
+        <li><a href="#refs">参照</a></li>
+      </ol>
+    </nav>
+
+    <main>
+      <header class="doc-header">
+        <p class="eyebrow">Technical explanation</p>
+        <h1><!-- タイトル --></h1>
+        <p class="summary"><!-- 1〜2 文の要約 --></p>
+        <div class="meta">
+          <span>対象: <!-- モジュール / 機能名 --></span>
+          <span>更新: <!-- YYYY-MM-DD --></span>
+        </div>
+      </header>
+
+      <section id="scope">
+        <h2>前提 / スコープ</h2>
+        <p><!-- 読む前提知識・対象範囲 --></p>
+        <div class="callout">
+          <p><strong>対象外:</strong> <!-- この文書で扱わないこと --></p>
+        </div>
+      </section>
+
+      <section id="overview">
+        <h2>全体像</h2>
+        <p><!-- 責務・データの流れの要約 --></p>
+        <pre><code><!-- 簡易フローや構成図（ASCII / 擬似） --></code></pre>
+      </section>
+
+      <section id="details">
+        <h2>詳細</h2>
+        <h3><!-- 小見出し --></h3>
+        <p><!-- なぜこの実装 / 設計なのか --></p>
+        <pre><code class="language-ts"><!-- 短いコード引用（要エスケープ） --></code></pre>
+      </section>
+
+      <section id="tradeoffs">
+        <h2>トレードオフ</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>選択</th>
+              <th>利点</th>
+              <th>代償 / 却下した案</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><!-- 選択 --></td>
+              <td><!-- 利点 --></td>
+              <td><!-- 代償 --></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="callout warn">
+          <p><strong>注意:</strong> <!-- 落とし穴や運用上の注意 --></p>
+        </div>
+      </section>
+
+      <section id="refs" class="refs">
+        <h2>参照</h2>
+        <ul>
+          <li><code><!-- path/to/file.ts --></code> — <!-- 役割 --></li>
+        </ul>
+      </section>
+
+      <footer>
+        Generated for local reading. 機密情報は含めないこと。
+      </footer>
+    </main>
+  </div>
+</body>
+</html>
