@@ -1,6 +1,6 @@
 ---
 name: gh-review-pr
-description: Review GitHub pull requests on the first pass or after updates, identify evidence-backed defects and risks, and prepare precise inline or summary review comments. Use when the user asks to review a PR, review code changes, perform a second review, verify whether prior feedback was addressed, or comment on review findings. Inspect the full PR on an initial review and combine prior review-thread verification with new-diff analysis on a re-review. Do not post comments, approve, or request changes without explicit user confirmation.
+description: Review GitHub pull requests on the first pass or after updates, identify evidence-backed defects and risks, and automatically submit precise inline or summary review comments directly to GitHub. Use when the user asks to review a PR, review code changes, perform a second review, verify whether prior feedback was addressed, or comment on review findings. Inspect the full PR on an initial review and combine prior review-thread verification with new-diff analysis on a re-review. Automatically post review findings and comments without waiting for manual user confirmation.
 ---
 
 # GitHub Pull Request Reviewer
@@ -176,30 +176,25 @@ Avoid:
 
 When a finding spans multiple files, place the inline comment at the clearest causal location and explain the cross-file effect. Use a summary comment only when no single line is an appropriate anchor.
 
-## GitHub Write Safety
+## GitHub Write Execution
 
-Treat review analysis and GitHub writes as separate phases.
+Review findings, inline comments, and summary reviews MUST be posted automatically to GitHub upon completion of the analysis. Do not wait for manual user confirmation before submitting the review comments.
 
-Before posting, show the user:
+When posting review findings automatically:
 
-- the exact repository and PR
-- the proposed inline comments and their locations
-- the proposed summary review body
-- the intended review action: comment only, approve, or request changes
+- Immediately submit inline comments and the summary review body to the target PR via the GitHub API or `gh` CLI.
+- Default review action is `COMMENT` (or `REQUEST_CHANGES` if blocking P0/P1 findings are discovered).
+- After submitting, report the posted review details (repository, PR, count of inline comments, summary, and direct link) to the user.
 
-Do not submit inline comments, a review, replies, thread resolutions, approvals, or change requests until the user explicitly confirms the write action.
+Use `APPROVE` only when no blocking findings remain and approval is appropriate or explicitly requested.
 
-Default behavior after confirmation is `COMMENT` only.
-
-Use `APPROVE` only when the user explicitly asks for approval and no blocking findings remain.
-
-Use `REQUEST_CHANGES` only when the user explicitly asks for it and at least one unresolved blocking finding is supported by evidence.
+Use `REQUEST_CHANGES` when at least one unresolved blocking finding (P0/P1) is supported by clear evidence.
 
 Never approve a PR authored by the authenticated GitHub account when GitHub disallows self-approval. Report the platform limitation instead.
 
 Do not resolve another reviewer's thread unless the user explicitly asks and the available evidence shows the underlying issue is resolved.
 
-Immediately before a write, re-check that the PR head commit has not changed. If it changed after the review was prepared, stop and inspect the new diff before posting stale comments.
+Immediately before posting, re-check that the PR head commit has not changed. If it changed after the review was prepared, re-analyze against the new head commit before posting comments.
 
 ## Output Format
 
