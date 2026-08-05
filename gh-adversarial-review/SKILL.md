@@ -60,7 +60,7 @@ Open [references/adversarial-checklist.md](references/adversarial-checklist.md) 
 
 1. From surfaces present in the PR, pick **at most three** sections.
 2. Prioritize by **impact**, **reachability**, **irreversibility**, and **uncertainty**—not by topical resemblance alone.
-3. Read **only** those section headings; never the whole file by default; never every prompt.
+3. Read the content of only the selected sections. Within each selected section, use only prompts relevant to the material claims under review. Never read the whole file by default or apply every prompt mechanically.
 4. Read **additional** sections only if initial analysis reveals a concrete cross-cutting risk, or a material claim cannot be tested with the first set.
 5. Do **not** widen scope because a section “might be related.” Record unread/unverified areas under **Residual risk**.
 
