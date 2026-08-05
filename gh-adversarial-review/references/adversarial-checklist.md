@@ -1,6 +1,6 @@
 # Adversarial Verification Checklist
 
-Falsification prompts only. Open the section that matches the PR risk surface (see `SKILL.md`). Do not run every prompt. Ungrounded answers are hypotheses, not findings—promote only under `SKILL.md` gates (`confirmed` / `strongly supported`).
+Falsification prompts only. Follow staged reading in `SKILL.md`: start with ≤3 prioritized sections; add sections only for concrete cross-cutting risk or an untestable material claim; do not widen for loose topical resemblance. Ungrounded answers are hypotheses—promote only under `SKILL.md` gates (`confirmed` / `strongly supported`).
 
 ## Requirements and invariants
 
