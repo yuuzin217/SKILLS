@@ -1,6 +1,6 @@
 ---
 name: gh-adversarial-review
-description: Adversarial second-pass verification of a GitHub PR after a normal review by falsifying claims and invariants with realistically reachable counterexamples. Use only when the user explicitly asks for adversarial review, red-team review, assumption falsification, or counterexample analysis. Do not use for generic initial review, generic re-review, or prior-feedback verification—those belong to gh-review-pr.
+description: Adversarial verification of a GitHub PR by falsifying claims and invariants with realistically reachable counterexamples. Normally use as a second-pass review after a normal review. It may run without a prior normal review only when the user explicitly requests adversarial-only analysis and accepts that the result is not comprehensive. Use only when the user explicitly asks for adversarial review, red-team review, assumption falsification, or counterexample analysis. Generic initial review, generic re-review, and prior-feedback verification belong to gh-review-pr.
 ---
 
 # GitHub Adversarial PR Review
@@ -17,7 +17,7 @@ Use this skill **only** when the user explicitly requests adversarial review, re
 
 Use this skill after a normal review has been completed.
 
-If no normal review is available in the conversation or PR history, route to `gh-review-pr` first. After the normal review is complete, return to this skill for adversarial verification.
+If no normal review is available in the conversation or PR history, use the analysis workflow from `gh-review-pr` as a prerequisite, but do not execute its GitHub write, review-submission, or automatic-posting steps unless the user explicitly requests posting. After the normal review analysis is complete, return to this skill for adversarial verification.
 
 If the user explicitly requests adversarial-only analysis without a normal review, proceed only after clearly stating that the result is not a comprehensive PR review.
 
@@ -125,4 +125,4 @@ Omit empty formal-finding templates when none survive.
 
 ### GitHub posting
 
-Default: report to the user only. Post to GitHub **only** when the user explicitly asks. Never auto-post. Never post `plausible but unverified`, `disproved`, or `out of scope` items—formal findings only. Use `gh-review-pr` solely for API/CLI comment mechanics when posting is requested.
+Default: report to the user only. Post to GitHub **only** when the user explicitly asks. Never auto-post. Never post `plausible but unverified`, `disproved`, or `out of scope` items—formal findings only. Use `gh-review-pr` for prerequisite normal-review analysis when needed, and for API/CLI comment mechanics when posting is explicitly requested. In both cases, this skill’s no-auto-post policy takes precedence over `gh-review-pr`.
