@@ -1,6 +1,6 @@
 ---
 name: gh-adversarial-review
-description: Adversarial verification of a GitHub PR by falsifying claims and invariants with realistically reachable counterexamples. Use only when the user explicitly asks for adversarial review, red-team review, assumption falsification, or counterexample analysis. Do not use for generic initial review, generic re-review, or prior-feedback verification—those belong to gh-review-pr.
+description: Adversarial second-pass verification of a GitHub PR after a normal review by falsifying claims and invariants with realistically reachable counterexamples. Use only when the user explicitly asks for adversarial review, red-team review, assumption falsification, or counterexample analysis. Do not use for generic initial review, generic re-review, or prior-feedback verification—those belong to gh-review-pr.
 ---
 
 # GitHub Adversarial PR Review
@@ -14,6 +14,12 @@ Falsify claims; do not run a full defect hunt. For PR resolution, diffs, and Git
 ## When to use
 
 Use this skill **only** when the user explicitly requests adversarial review, red-team review, assumption falsification, counterexample analysis, or clear synonyms.
+
+Use this skill after a normal review has been completed.
+
+If no normal review is available in the conversation or PR history, route to `gh-review-pr` first. After the normal review is complete, return to this skill for adversarial verification.
+
+If the user explicitly requests adversarial-only analysis without a normal review, proceed only after clearly stating that the result is not a comprehensive PR review.
 
 Route to `gh-review-pr` for:
 
