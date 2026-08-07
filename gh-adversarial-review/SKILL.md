@@ -5,7 +5,7 @@ description: Adversarial verification of a GitHub PR by falsifying claims and in
 
 # GitHub Adversarial PR Review
 
-Falsify claims; do not run a full defect hunt. For PR resolution, diffs, and GitHub auth/CLI mechanics, follow `../gh-review-pr/SKILL.md`. Do **not** inherit that skill’s auto-post policy.
+Falsify claims; do not run a full defect hunt. For PR resolution, diffs, and GitHub auth/CLI mechanics, follow `../gh-review-pr/SKILL.md`. Both skills default to report-only; post to GitHub only on explicit user request.
 
 **Goal:** Test whether implementation, tests, PR text, and prior-review conclusions survive realistic counterexamples.
 
@@ -17,7 +17,7 @@ Use this skill **only** when the user explicitly requests adversarial review, re
 
 Use this skill after a normal review has been completed.
 
-If no normal review is available in the conversation or PR history, use the analysis workflow from `gh-review-pr` as a prerequisite, but do not execute its GitHub write, review-submission, or automatic-posting steps unless the user explicitly requests posting. After the normal review analysis is complete, return to this skill for adversarial verification.
+If no normal review is available in the conversation or PR history, run `gh-review-pr` normal-review analysis as a prerequisite—bypassing its routing and posting steps, and without re-invoking adversarial routing. After analysis, return here for adversarial verification.
 
 If the user explicitly requests adversarial-only analysis without a normal review, proceed only after clearly stating that the result is not a comprehensive PR review.
 
@@ -42,7 +42,7 @@ Do not modify code unless asked.
 
 1. **Identify claims and invariants** — Prefer prior-review conclusions, then PR/issue text and tests.
 2. **Trace paths those claims depend on** — Entry points, trust boundaries, ownership, async handoffs, side effects.
-3. **Select checklist sections (≤3)** — See below; construct one reachable counterexample per material claim.
+3. **Select checklist sections (≤3 initially)** — See below; construct one reachable counterexample per material claim.
 4. **Hunt defeating guards** — Constraints, transactions, locks, idempotency, flags, or tests that already block the scenario.
 5. **Validate narrowly** — Focused test or precise static evidence. Green CI alone does not prove a claim.
 6. **Keep only survivors** — Formal findings: `confirmed` or `strongly supported`.
@@ -64,7 +64,7 @@ Optional severity: reuse `gh-review-pr` P0–P3; do not inflate.
 
 Open [references/adversarial-checklist.md](references/adversarial-checklist.md) only as follows:
 
-1. From surfaces present in the PR, pick **at most three** sections.
+1. From surfaces present in the PR, pick **at most three sections initially**.
 2. Prioritize by **impact**, **reachability**, **irreversibility**, and **uncertainty**—not by topical resemblance alone.
 3. Read the content of only the selected sections. Within each selected section, use only prompts relevant to the material claims under review. Never read the whole file by default or apply every prompt mechanically.
 4. Read **additional** sections only if initial analysis reveals a concrete cross-cutting risk, or a material claim cannot be tested with the first set.
@@ -125,4 +125,4 @@ Omit empty formal-finding templates when none survive.
 
 ### GitHub posting
 
-Default: report to the user only. Post to GitHub **only** when the user explicitly asks. Never auto-post. Never post `plausible but unverified`, `disproved`, or `out of scope` items—formal findings only. Use `gh-review-pr` for prerequisite normal-review analysis when needed, and for API/CLI comment mechanics when posting is explicitly requested. In both cases, this skill’s no-auto-post policy takes precedence over `gh-review-pr`.
+Default: report to the user only. Post to GitHub **only** when the user explicitly asks. Never post `plausible but unverified`, `disproved`, or `out of scope` items—formal findings only. For API/CLI comment mechanics when posting, follow `gh-review-pr`.
