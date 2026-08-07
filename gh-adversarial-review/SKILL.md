@@ -64,7 +64,7 @@ Optional severity: reuse `gh-review-pr` P0–P3; do not inflate.
 
 Open [references/adversarial-checklist.md](references/adversarial-checklist.md) only as follows:
 
-1. From surfaces present in the PR, pick **at most three** sections.
+1. From surfaces present in the PR, pick **at most three sections initially**.
 2. Prioritize by **impact**, **reachability**, **irreversibility**, and **uncertainty**—not by topical resemblance alone.
 3. Read the content of only the selected sections. Within each selected section, use only prompts relevant to the material claims under review. Never read the whole file by default or apply every prompt mechanically.
 4. Read **additional** sections only if initial analysis reveals a concrete cross-cutting risk, or a material claim cannot be tested with the first set.
