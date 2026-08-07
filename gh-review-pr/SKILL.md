@@ -80,7 +80,7 @@ Unavailable thread state → `cannot verify`; do not guess.
 
 Expand in order; stop when sufficient:
 
-1. PR metadata / requirements → 2. changed files / complete diff → 3. surrounding changed code → 4. callers/callees/contracts → 5. guards/tests/schema for candidate findings → 6. checklist sections (≤3) → 7. extra context only for concrete cross-cutting risk.
+1. PR metadata / requirements → 2. changed files / complete diff → 3. surrounding changed code → 4. callers/callees/contracts → 5. guards/tests/schema for candidate findings → 6. checklist sections (≤3 initially) → 7. extra context only for concrete cross-cutting risk.
 
 **Forbidden:** whole-repo reads; unrelated architecture bulk; reads “for understanding”; unrelated deep caller trees; full checklist before code; mechanical checklist scan.
 

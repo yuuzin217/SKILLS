@@ -42,7 +42,7 @@ Do not modify code unless asked.
 
 1. **Identify claims and invariants** — Prefer prior-review conclusions, then PR/issue text and tests.
 2. **Trace paths those claims depend on** — Entry points, trust boundaries, ownership, async handoffs, side effects.
-3. **Select checklist sections (≤3)** — See below; construct one reachable counterexample per material claim.
+3. **Select checklist sections (≤3 initially)** — See below; construct one reachable counterexample per material claim.
 4. **Hunt defeating guards** — Constraints, transactions, locks, idempotency, flags, or tests that already block the scenario.
 5. **Validate narrowly** — Focused test or precise static evidence. Green CI alone does not prove a claim.
 6. **Keep only survivors** — Formal findings: `confirmed` or `strongly supported`.
