@@ -1,278 +1,217 @@
 ---
 name: gh-review-pr
-description: Review GitHub pull requests on the first pass or after updates, identify evidence-backed defects and risks, and automatically submit precise inline or summary review comments directly to GitHub. Use when the user asks to review a PR, review code changes, perform a second review, verify whether prior feedback was addressed, or comment on review findings. Inspect the full PR on an initial review and combine prior review-thread verification with new-diff analysis on a re-review. Automatically post review findings and comments without waiting for manual user confirmation.
+description: Review GitHub pull requests on the first pass or after updates, identify evidence-backed defects and risks, and report findings to the user. Use when the user asks to review a PR, review code changes, perform a re-review after code changes, verify whether prior feedback was addressed, or review newly changed code after a previous review. Inspect the full PR on an initial review and combine prior review-thread verification with new-diff analysis on a re-review. Post to GitHub only when the user explicitly requests it.
 ---
 
 # GitHub Pull Request Reviewer
 
-Review a GitHub pull request for correctness, regressions, security, data integrity, performance, concurrency, error handling, test coverage, maintainability, and scope discipline. Support both initial reviews and re-reviews in one workflow.
+Default: **review analysis only** — report to user; **no GitHub write**.
 
-Prefer the GitHub app from this plugin for repository, pull request, patch, commit, check, and top-level comment data. Use local `git` and `gh` only where the connector cannot provide sufficient context, particularly for current-branch PR discovery, thread-aware review state, exact diff inspection, or local test execution.
+**Goal:** Confirm the implementation meets requirements and find concrete defects or regressions **introduced or materially affected** by this PR.
 
-Run networked `gh` commands with elevated network access. When CLI access is needed, check `gh auth status` first. If authentication fails, tell the user that GitHub CLI authentication is required and ask them to run `gh auth login`.
+**Not goals:** Style nits, vague concerns, speculative findings, unrelated pre-existing issues, routine praise, or inventing issues to appear thorough.
 
-## Review Modes
+## Routing
 
-Determine the mode from the PR state and the user's request.
+**Use this skill:** generic initial PR review; re-review after code changes; prior-feedback verification; review of newly changed code after a previous review; generic PR code review.
+
+**Route to `gh-adversarial-review`** only on **explicit** request for adversarial review, red-team review, assumption falsification, counterexample analysis, or clear synonyms.
+
+Do **not** route generic re-review (“review again,” “fixed—re-review,” “were comments addressed?”) to adversarial review.
+
+## Principles
+
+- Report defects, not suspicions. Review behavior, not isolated syntax.
+- Prefer few well-supported findings over many speculative ones.
+- Zero findings is valid. Green CI alone does not prove correctness.
+- Do not invent findings to appear thorough.
+
+**Not formal findings:** naming/formatting/style preferences; vague concerns; unreachable hypotheses; unrelated pre-existing issues; unproven large refactors; routine praise.
+
+## Review modes
 
 ### Initial review
 
-Use initial-review mode when there is no earlier review to verify, or when the user asks for a full review from scratch.
+Review the **full PR** (complete merge-base diff), not only the latest commit.
 
-Inspect:
+Minimum: PR title/description; linked issue / acceptance criteria when relevant; surrounding implementation; affected callers/interfaces/contracts; relevant schema/migration/config; relevant tests; CI when available.
 
-- the PR title, description, linked issue, acceptance criteria, and stated scope
-- the complete merge-base diff, not only the latest commit
-- affected call sites, interfaces, schemas, migrations, configuration, and tests
-- relevant repository conventions and nearby implementation patterns
-- CI or test results when available
-
-Do not infer correctness from a green CI result alone. CI can demonstrate that selected checks passed; it does not prove that behavior, requirements, or edge cases are correct.
+Center on changed code; widen only as needed. Do not read the entire repository.
 
 ### Re-review
 
-Use re-review mode when the PR has changed after review feedback, the user asks for another review, or previous review threads exist.
+When implementation changed after feedback, user asks for another normal review, or prior findings need verification.
 
-Inspect both:
+**Always:** (1) verify each previous actionable finding; (2) check for new defects since the prior review.
 
-1. previous actionable review findings and whether each was addressed; and
-2. all changes introduced since the relevant prior review, including newly created regressions.
+| Status | Meaning |
+| --- | --- |
+| `resolved` | Original failure mode no longer holds |
+| `partially resolved` | Material risk remains |
+| `unresolved` | Issue still present |
+| `superseded` | Later design made finding irrelevant |
+| `cannot verify` | Insufficient evidence |
 
-Classify each earlier actionable finding as:
+`resolved` = failure mode gone—not merely code changed near the comment. Per finding: original failure mode → current implementation → guards/callers/tests → status.
 
-- `resolved`: the implementation now addresses the underlying issue
-- `partially resolved`: some of the issue was fixed, but a material risk remains
-- `unresolved`: the issue is still present
-- `superseded`: later design changes made the original finding irrelevant
-- `cannot verify`: available code or runtime evidence is insufficient
-
-Do not mark a finding resolved merely because code changed near the commented line. Verify the behavior that motivated the original comment.
-
-When thread resolution state or inline anchors matter, use a thread-aware GitHub GraphQL query or an available bundled comment-fetching workflow. Flat issue or PR comments are not a complete substitute for review-thread state.
+Do not duplicate unresolved threads as new findings for the same failure mode.
 
 ## Workflow
 
-### 1. Resolve the pull request
+1. **Resolve PR** — repo/PR number/URL, or local branch via `gh pr view --json number,url,baseRefName,headRefName`. Report ambiguity; do not guess.
+2. **Requirements** — PR description, linked issue, acceptance criteria, relevant repo guidance. Distinguish defects from preferences.
+3. **Change context (staged)** — [Staged context acquisition](#staged-context-acquisition). Complete merge-base diff on initial review.
+4. **Prior state (re-review)** — prior reviews, unresolved threads, replies, post-review commits. Thread-aware data required; flat comments alone are insufficient.
+5. **Analyze** — [Formal finding gate](#formal-finding-gate); checklist sections as needed ([Checklist staged reading](#checklist-staged-reading)).
+6. **Validate** — narrowest useful check: focused test → reproduction → typecheck → lint/static → build → broader suite. Record `passed` / `failed` / `not run (<reason>)`; never claim unrun commands passed.
+7. **Report** — [Output](#output). GitHub write only on explicit request ([GitHub posting](#github-posting)).
 
-Use a repository and PR number or PR URL supplied by the user.
+## Evidence acquisition
 
-For requests referring to “this PR,” “the current branch,” or similar local context:
+Prefer structured GitHub data: metadata, changed files, patches/diff, commits, review threads, check status.
 
-1. inspect the local Git repository and current branch;
-2. use `gh pr view --json number,url,baseRefName,headRefName` when needed;
-3. if multiple or no matching PRs exist, report the ambiguity rather than guessing.
+Use `git` / `gh` / GraphQL when insufficient: branch→PR resolution, local source inspection, test execution, thread state, connector gaps.
 
-If neither the request nor the local checkout identifies a PR, ask for the repository and PR number or URL.
+Networked `gh` with elevated access. Check `gh auth status`; on failure, ask user to run `gh auth login`.
 
-### 2. Establish review scope
+Unavailable thread state → `cannot verify`; do not guess.
 
-Read the PR description, linked issue, and repository guidance such as `AGENTS.md`, `CONTRIBUTING.md`, coding standards, architecture documents, or test instructions.
+## Staged context acquisition
 
-Derive the intended behavior and acceptance criteria before judging implementation details. Distinguish:
+Expand in order; stop when sufficient:
 
-- defects relative to the stated requirements
-- repository-policy violations
-- plausible risks that require clarification
-- optional improvements and personal preferences
+1. PR metadata / requirements → 2. changed files / complete diff → 3. surrounding changed code → 4. callers/callees/contracts → 5. guards/tests/schema for candidate findings → 6. checklist sections (≤3) → 7. extra context only for concrete cross-cutting risk.
 
-Only the first two categories normally justify blocking review findings.
+**Forbidden:** whole-repo reads; unrelated architecture bulk; reads “for understanding”; unrelated deep caller trees; full checklist before code; mechanical checklist scan.
 
-### 3. Gather the complete change context
+**Required:** read context needed to establish reachability, guard absence, incorrect behavior, and impact for any candidate finding.
 
-Inspect the full PR diff against the merge base. Also inspect enough surrounding code to understand behavior across file boundaries.
+**Narrow first, widen on evidence.**
 
-Pay particular attention to:
+## Checklist staged reading
 
-- public API or contract changes
-- database schemas, migrations, transactions, and rollback behavior
-- authorization, authentication, secret handling, and input validation
-- asynchronous processing, retries, idempotency, ordering, and race conditions
-- error propagation, partial failure, cleanup, and observability
-- compatibility with existing callers, stored data, clients, and deployments
-- tests that should fail before the fix and pass afterward
-- generated files, lockfiles, vendored code, and configuration changes
+Prompts: [references/review-checklist.md](references/review-checklist.md). **Do not read the full file by default.**
 
-Do not review only filenames or isolated hunks when the behavior depends on surrounding code.
+| Changed surface | Section |
+| --- | --- |
+| requirements / contracts / API | Requirements and contracts |
+| control flow / business logic | Correctness and control flow |
+| auth / permissions | Authorization and authentication |
+| input / trust boundaries | Input validation and trust boundaries |
+| SQL / persistence / transaction | Data integrity and transactions |
+| schema / migration | Schema and migrations |
+| async / queue / event | Concurrency and ordering |
+| retry / job / webhook | Retries and idempotency |
+| errors / multi-step work | Error handling and partial failures |
+| API / client / stored shape | Compatibility and API changes |
+| deploy-sensitive | Deployment and rollback |
+| hot path / batch / limits | Resource usage and performance |
+| logs / metrics / recovery | Observability and recovery |
+| tests | Test validity and coverage |
+| config / generated / lockfiles | Configuration and generated artifacts |
 
-### 4. Inspect prior review state for re-reviews
+**≤3 sections initially** — prioritize impact, changed surface, uncertainty, irreversibility.
 
-Collect prior reviews, unresolved threads, author replies, and commits made after the relevant review.
+**Add sections only for:** concrete cross-cutting risk; material finding needing another section; PR clearly spanning multiple high-risk areas.
 
-For each prior actionable finding:
+**Forbidden:** “just in case”; topical resemblance; full scan; all sections every time. No DB → skip migrations; no async → skip retries; no auth change → skip auth; no deploy risk → skip deployment.
 
-1. restate the underlying failure mode, not merely the old wording;
-2. locate the current implementation;
-3. inspect related tests and callers;
-4. assign a resolution classification;
-5. retain the original severity unless evidence justifies changing it.
+Checklist supplements reasoning; does not replace complete diff inspection.
 
-Avoid reposting an unresolved issue as a new duplicate comment. Prefer replying to or summarizing the existing thread when possible.
+## Formal finding gate
 
-### 5. Analyze findings
+Formal finding requires all premises:
 
-A review finding must identify a concrete, user-relevant or system-relevant failure mode. Before reporting it, verify all of the following:
+| Premise | Requirement |
+| --- | --- |
+| PR causation | Introduced or materially affected by this PR |
+| Reachability | Realistic production/runtime path |
+| Guard absence | Not blocked by validation, caller guarantees, DB constraints, transactions, locks, uniqueness, idempotency, auth, lifecycle rules, framework guarantees |
+| Incorrect behavior | Violates requirement, contract, invariant, or expected behavior |
+| Impact | Beyond style; worth reporting |
+| Correction viability | Fix does not contradict requirements |
 
-- the behavior is introduced or materially affected by this PR
-- the relevant code path is reachable under realistic conditions
-- the impact is more than stylistic preference
-- the claim is supported by the diff and surrounding implementation
-- the proposed correction does not conflict with stated requirements
+Actively search for defeating guards before reporting. Unconfirmed premises → **unsupported hypothesis** or **residual risk**, not a formal finding. Do not use low severity as a weak-evidence substitute.
 
-Use these severity levels:
+## Severity
 
-- `P0 — Critical`: immediate and broadly destructive, exploitable, or release-blocking failure
-- `P1 — High`: likely production defect, security issue, data loss, serious regression, or broken primary flow
-- `P2 — Medium`: real defect or reliability problem with narrower conditions or impact
-- `P3 — Low`: minor correctness, maintainability, or test gap worth fixing but normally non-blocking
+Impact/urgency only—not confidence.
 
-Do not inflate severity to make a comment more noticeable.
+- `P0 — Critical` — immediate, broadly destructive, exploitable, release-blocking
+- `P1 — High` — likely production defect, security, data loss, serious regression, broken primary flow
+- `P2 — Medium` — real defect, narrower conditions/impact
+- `P3 — Low` — minor gap; normally non-blocking
 
-### 6. Validate with tests and tools
+Do not inflate severity.
 
-Run the narrowest relevant tests, linters, type checks, static analysis, or build commands available in the repository when local execution is possible.
+## Large PRs
 
-Start with tests closest to the changed behavior, then widen only when justified. Do not claim a command passed unless it was actually executed successfully.
+Prioritize high-risk files/interfaces; group remainder by subsystem; disclose reviewed vs unverified scope; never present partial review as complete. Still use staged checklist—not full upfront.
 
-If tests cannot be run, state the exact limitation. Continue with static review, but distinguish verified behavior from inference.
+## Output
 
-### 7. Prepare review output
+Concise only. Omit praise, file inventories, investigation narrative, checklist-completion notes, redundant summaries.
 
-Present findings before any GitHub write action. Order findings by severity, then by file and line.
-
-Each finding should contain:
-
-- severity and concise title
-- file and current line or a precise code location
-- the triggering condition
-- the resulting incorrect behavior or risk
-- a concise explanation of why the current implementation permits it
-- a correction direction, without prescribing an unnecessarily large redesign
-
-For re-reviews, include a separate prior-feedback status section before new findings.
-
-If no material findings remain, say so directly and mention any residual verification limitations. Do not invent comments to appear thorough.
-
-## Comment Quality
-
-Write comments that are concise, specific, and actionable.
-
-A good inline comment explains the failure mode in a few sentences and points to the smallest relevant line range. It should make sense without requiring the author to reconstruct the reviewer’s entire investigation.
-
-Prefer wording such as:
-
-> `P1 — Retry can apply the balance update twice`
->
-> If the database commit succeeds but the acknowledgement fails, this job is retried and executes the increment again. Because the operation has no idempotency key or uniqueness guard, a transient worker failure can duplicate the user's balance update. Please make the write idempotent before acknowledging the job.
-
-Avoid:
-
-- vague statements such as “this looks wrong”
-- comments based only on naming or formatting preferences
-- long tutorials unrelated to the defect
-- speculative claims without a reachable scenario
-- duplicating an existing unresolved thread
-- requesting broad refactors when a localized fix is sufficient
-- praising routine code in inline review comments
-
-When a finding spans multiple files, place the inline comment at the clearest causal location and explain the cross-file effect. Use a summary comment only when no single line is an appropriate anchor.
-
-## GitHub Write Execution
-
-Review findings, inline comments, and summary reviews MUST be posted automatically to GitHub upon completion of the analysis. Do not wait for manual user confirmation before submitting the review comments.
-
-When posting review findings automatically:
-
-- Immediately submit inline comments and the summary review body to the target PR via the GitHub API or `gh` CLI.
-- Default review action is `COMMENT` (or `REQUEST_CHANGES` if blocking P0/P1 findings are discovered).
-- After submitting, report the posted review details (repository, PR, count of inline comments, summary, and direct link) to the user.
-
-Use `APPROVE` only when no blocking findings remain and approval is appropriate or explicitly requested.
-
-Use `REQUEST_CHANGES` when at least one unresolved blocking finding (P0/P1) is supported by clear evidence.
-
-Never approve a PR authored by the authenticated GitHub account when GitHub disallows self-approval. Report the platform limitation instead.
-
-Do not resolve another reviewer's thread unless the user explicitly asks and the available evidence shows the underlying issue is resolved.
-
-Immediately before posting, re-check that the PR head commit has not changed. If it changed after the review was prepared, re-analyze against the new head commit before posting comments.
-
-## Output Format
-
-Use this structure for an initial review:
+### Initial review
 
 ```text
-## Review findings
+## Review result
+<brief overall assessment>
 
+## Findings
 ### P1 — <title>
-`path/to/file.ts:<line>`
-
-<failure condition and impact>
-
-<recommended correction direction>
+`path:line`
+Trigger: ... | Behavior: ... | Why it occurs: ... | Impact: ... | Correction direction: ...
 
 ## Verification
+- `<command>`: passed | failed | not run (<reason>)
 
-- `<command>`: passed/failed/not run
-
-## Proposed GitHub review
-
-- Action: COMMENT
-- Inline comments: <count>
-- Summary: <brief conclusion>
+## Residual risk
+- <important unverified area only>
 ```
 
-Use this structure for a re-review:
+No findings: `## Review result` → “No material defects found in the reviewed scope.” + Verification + Residual risk.
+
+### Re-review
 
 ```text
 ## Previous feedback status
-
-- Resolved: <count>
-- Partially resolved: <count>
-- Unresolved: <count>
-- Superseded: <count>
-- Cannot verify: <count>
-
+- Resolved/Partially resolved/Unresolved/Superseded/Cannot verify: <counts>
 ### <status> — <previous finding>
-<verification result and evidence>
+<verification + evidence>
 
-## New review findings
+## New findings
+<findings or "No new material findings.">
 
-<new findings, or "No new material findings.">
-
-## Verification
-
-- `<command>`: passed/failed/not run
-
-## Proposed GitHub review
-
-- Action: COMMENT
-- Inline comments: <count>
-- Summary: <brief conclusion>
+## Verification / Residual risk
 ```
 
-When there are no findings, do not include empty finding templates. State that no material defects were found in the reviewed scope and list any tests or areas that were not verifiable.
+## GitHub posting
 
-## Relationship to Other Skills
+**Default:** report only; no write. Review request ≠ posting authorization.
 
-Use this skill to review code and prepare or submit review feedback.
+**Post on explicit request only** (“post to GitHub,” “submit review,” “approve,” “request changes”).
 
-Route follow-up implementation work to `../gh-address-comments/SKILL.md` when the user wants to address review comments by modifying code.
+**Formal findings only**—not hypotheses, speculation, disproved candidates, pre-existing issues, or residual risk as defects.
 
-Route failing GitHub Actions investigation to `../gh-fix-ci/SKILL.md` when diagnosing CI failures becomes the primary task.
+When posting: smallest causal inline anchor; no duplicate unresolved threads; summary only if no anchor; re-check PR head before submit and re-verify if changed.
 
-Route commit, push, and pull-request publication work to `../yeet/SKILL.md`.
+Actions: `COMMENT` (non-blocking); `REQUEST_CHANGES` (supported unresolved P0/P1 blocking safe merge); `APPROVE` (explicit request or clearly appropriate and permitted).
 
-Do not silently expand a review request into code modification. A reviewer can propose a correction, but changing the branch is a separate user-authorized task.
+Do not resolve others' threads unless user asks and failure mode is confirmed resolved. Analysis and write are separate steps.
 
-## Fallbacks
+## Other skills
 
-If the connector lacks thread-level review context, use `gh api graphql` when authentication and repository access permit it.
+| Skill | Role |
+| --- | --- |
+| **gh-review-pr** | Initial review, re-review, prior-feedback verification |
+| **gh-adversarial-review** | Falsify claims/invariants via counterexamples—explicit intent only |
+| **gh-address-comments** | Code changes for review feedback |
+| **gh-fix-ci** | CI failure investigation/fix |
+| **yeet** | Commit, push, PR publication |
 
-If the PR diff is too large to inspect reliably in one pass:
+Do not expand review requests into code modification.
 
-1. review high-risk files and interfaces first;
-2. group the remaining files by subsystem;
-3. clearly disclose the portions reviewed and not yet verified;
-4. do not present a partial review as complete.
+## Fallback
 
-If repository access, PR context, local checkout, authentication, or required generated artifacts are unavailable, identify the exact blocker and continue with any independently verifiable parts rather than guessing.
+Missing evidence (threads, artifacts, runtime, tests, repo context): state limitation; review verifiable scope only; use `cannot verify`; note gaps under Residual risk. Do not guess.

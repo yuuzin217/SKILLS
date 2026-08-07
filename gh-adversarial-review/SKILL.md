@@ -5,7 +5,7 @@ description: Adversarial verification of a GitHub PR by falsifying claims and in
 
 # GitHub Adversarial PR Review
 
-Falsify claims; do not run a full defect hunt. For PR resolution, diffs, and GitHub auth/CLI mechanics, follow `../gh-review-pr/SKILL.md`. Do **not** inherit that skill’s auto-post policy.
+Falsify claims; do not run a full defect hunt. For PR resolution, diffs, and GitHub auth/CLI mechanics, follow `../gh-review-pr/SKILL.md`. Both skills default to report-only; post to GitHub only on explicit user request.
 
 **Goal:** Test whether implementation, tests, PR text, and prior-review conclusions survive realistic counterexamples.
 
@@ -125,4 +125,4 @@ Omit empty formal-finding templates when none survive.
 
 ### GitHub posting
 
-Default: report to the user only. Post to GitHub **only** when the user explicitly asks. Never auto-post. Never post `plausible but unverified`, `disproved`, or `out of scope` items—formal findings only. Use `gh-review-pr` for prerequisite normal-review analysis when needed, and for API/CLI comment mechanics when posting is explicitly requested. In both cases, this skill’s no-auto-post policy takes precedence over `gh-review-pr`.
+Default: report to the user only. Post to GitHub **only** when the user explicitly asks. Never post `plausible but unverified`, `disproved`, or `out of scope` items—formal findings only. Use `gh-review-pr` for prerequisite normal-review analysis when needed, and for API/CLI comment mechanics when posting is explicitly requested.
