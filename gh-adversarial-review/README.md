@@ -34,7 +34,7 @@ Cursor のスキル設定で `gh-adversarial-review/` ディレクトリをス�
 ### 2. 前提条件
 
 - 通常レビュー（会話内または PR 履歴）が完了していることが望ましい
-- 通常レビューがない場合は `gh-review-pr` の分析 workflow を prerequisite として実行
+- 通常レビューがない場合は `gh-review-pr` の normal-review analysis を prerequisite として実行（routing / posting は適用しない）
 - PR 解決・diff 取得・`gh` 認証は `gh-review-pr` の手順に従う
 
 ### 3. プロンプト例
@@ -61,7 +61,7 @@ adversarial-only で分析して。包括的 PR レビューではないこと�
 
 1. claims / invariants を特定（prior review → PR/issue text → tests）
 2. 各 claim が依存する path を trace
-3. adversarial checklist から最大3 section を選択
+3. adversarial checklist から section を選択（初回は原則最大3、追加リスク判明時のみ拡張）
 4. 到達可能な counterexample を構築し、defeating guard を探索
 5. 狭い検証を実行
 6. `confirmed` / `strongly supported` のみ formal finding として報告
@@ -98,5 +98,5 @@ adversarial-only で分析して。包括的 PR レビューではないこと�
 
 - **Seek falsification, not confirmation** — PR 本文・green CI・テストも claim として扱う
 - **Zero formal findings は正常な結果**
-- **≤3 checklist sections** — 全文 mechanical scan はしない
+- **Checklist staged reading** — 初回は原則≤3 section、追加リスク判明時のみ拡張；全文 scan はしない
 - **GitHub 投稿は formal findings のみ** — `plausible but unverified` 等は投稿しない

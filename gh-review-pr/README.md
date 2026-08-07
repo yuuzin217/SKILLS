@@ -62,7 +62,7 @@ P1 の指摘を PR に投稿して、REQUEST_CHANGES で submit して。
 1. PR を特定（URL / 番号 / 現在ブランチ）
 2. 要件・complete merge-base diff を取得
 3. staged に context を広げながら defect を分析（formal finding gate 適用）
-4. 必要なら checklist section を最大3つまで参照
+4. 必要なら checklist section を選択（初回は原則最大3、追加リスク判明時のみ拡張）
 5. 狭い範囲の検証（テスト・型チェック等）を実行
 6. ユーザーへ報告（明示要求時のみ GitHub 投稿）
 

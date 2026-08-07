@@ -190,13 +190,13 @@ No findings: `## Review result` → “No material defects found in the reviewed
 
 **Default:** report only; no write. Review request ≠ posting authorization.
 
-**Post on explicit request only** (“post to GitHub,” “submit review,” “approve,” “request changes”).
+All GitHub write actions—inline comments, summary review, `COMMENT`, `REQUEST_CHANGES`, `APPROVE`, thread resolution—require explicit posting authorization (“post to GitHub,” “submit review,” “approve,” “request changes”).
 
 **Formal findings only**—not hypotheses, speculation, disproved candidates, pre-existing issues, or residual risk as defects.
 
 When posting: smallest causal inline anchor; no duplicate unresolved threads; summary only if no anchor; re-check PR head before submit and re-verify if changed.
 
-Actions: `COMMENT` (non-blocking); `REQUEST_CHANGES` (supported unresolved P0/P1 blocking safe merge); `APPROVE` (explicit request or clearly appropriate and permitted).
+After authorization, choose action: `COMMENT` (non-blocking); `REQUEST_CHANGES` (supported unresolved P0/P1 blocking safe merge); `APPROVE` (when appropriate and permitted).
 
 Do not resolve others' threads unless user asks and failure mode is confirmed resolved. Analysis and write are separate steps.
 
