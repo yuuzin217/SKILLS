@@ -1,6 +1,6 @@
 ---
 name: github-issue-creator
-description: Research a repository and turn requirements into concise, implementation-ready GitHub Issues. Use when asked to create or update an issue, turn a requirement or plan into issues, split development work, or organize existing issues. Keep consultation and draft-only requests read-only.
+description: Research a repository and turn requirements into concise, implementation-ready GitHub Issues. Use when asked to create new issues, turn a requirement or plan into issues, or split work for filing. Prefer github-issue-refiner for updating or organizing existing issues. Keep consultation and draft-only requests read-only.
 ---
 
 # GitHub Issue Creator
@@ -11,13 +11,14 @@ Turn a user's request into a clear, verifiable GitHub Issue grounded in the targ
 
 ## When to use
 
-Use for requests such as:
+Use primarily when creating new issues or turning a requirement into issue drafts:
 
 - “Create/file a GitHub Issue for this.” / 「GitHub Issueを作成して」「Issueを起票して」
 - “Turn this requirement into an issue.” / 「この要件をIssueにまとめて」
 - “Split this work into issues.” / 「開発タスクをIssueに分割して」
-- “Organize the existing issues.” / 「既存Issueを整理して」
 - “Register this implementation plan as issues.” / 「実装計画をIssueとして登録して」
+
+For updating or organizing existing issues, prefer `github-issue-refiner`. This skill's explicit, identified update workflow remains available when the refiner is not installed or this skill is deliberately selected.
 
 An activation phrase does not by itself authorize a write. Follow the authorization boundary below.
 
