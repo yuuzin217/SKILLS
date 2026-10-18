@@ -30,8 +30,16 @@ Use `github-issue-creator` for new Issues, requirement-to-Issue drafting, or spl
 
 ## Workflow
 
-1. **Resolve scope.** Identify the repository, operation (content update, format normalization, or batch), and exact Issue set.
-   Read applicable repository guidance, issue templates, and current default branch.
+1. **Resolve scope and collect targets.** Identify the repository, operation (content update, format
+   normalization, or batch), and exact Issue scope. Read applicable repository guidance, issue templates,
+   and current default branch. For batches and number ranges, finish collecting candidates before any write:
+   - Follow REST `Link: rel="next"` pages (up to 100 items per page), GraphQL cursors until
+     `hasNextPage=false`, or the available tool's equivalent. Confirm CLI/tool results are not capped.
+   - Exclude REST results with a `pull_request` key. Inspect every number in an explicit range and skip PRs.
+     Deduplicate by repository and number, then freeze the qualifying Issue list, count, requested state,
+     and range.
+   - If a page fails or completeness is uncertain, do not start batch writes. Report retrieved and processed
+     counts plus the uncollected count or range; say when it cannot be determined.
    Do not infer a repository or broaden the target set.
 2. **Capture current state.** Fetch each target Issue's latest body, title, state, closure reason, labels, assignees,
    milestone, and other available metadata. Read linked Issues, pull requests, and discussion for context.
@@ -45,8 +53,8 @@ Use `github-issue-creator` for new Issues, requirement-to-Issue drafting, or spl
    - `BLOCKED`: access, a conflict, or a tool failure prevents a safe update.
 5. **Prepare minimal changes.** Change only requested content and confirmed inaccuracies.
    For format-only requests, preserve meaning and status; do not invent requirements or progress.
-   For batches, determine the target count and planned changes before writing. If scope is explicit, share that summary
-   before the first write and proceed without waiting for additional approval. Process only `UPDATE` Issues in small, sequential units.
+   For batches, share the frozen target count and planned changes before the first write. If scope is explicit, proceed
+   without waiting for additional approval. Process only `UPDATE` Issues in small, sequential units.
    Do not include related but out-of-scope Issues. Re-running an already aligned Issue should yield `NO_CHANGE`.
 6. **Protect information and progress.** Prepare each edit from the captured Issue body; do not rebuild it from a blank template.
    Preserve unrequested requirements, decisions, scope, exclusions, constraints, dependencies, links, checklist states,
@@ -73,9 +81,12 @@ Use `github-issue-creator` for new Issues, requirement-to-Issue drafting, or spl
    verification method, preserved information, checkbox states, readability, and authorization.
    Keep prose concise, each bullet to one point, and implementation steps separate from completion criteria.
    Apply `github-issue-creator` quality guidance when available; the shared rules below are the standalone fallback.
-9. **Update safely.** Immediately before writing, fetch the Issue again and compare every field being changed with the captured state.
-   Reconcile non-conflicting edits against the latest version. If a safe merge is unclear, leave that Issue unchanged and classify it
-   as `BLOCKED` or `REVIEW_REQUIRED`. Use conditional updates when supported and send only authorized fields.
+9. **Update safely.** Immediately before writing, fetch the target again and verify it is an Issue (for REST,
+   `pull_request` is absent) and still matches the frozen repository, range, and requested state. Skip PRs and
+   targets that left the requested scope, and record them as excluded. Compare every field being changed with
+   the captured state. Reconcile non-conflicting edits against the latest version. If a safe merge is unclear,
+   leave that Issue unchanged and classify it as `BLOCKED` or `REVIEW_REQUIRED`. Use conditional updates when
+   supported and send only authorized fields.
    If the result is uncertain, fetch and compare before deciding whether to retry; never resend blindly.
 10. **Verify and report.** Fetch each updated Issue again and confirm the requested changes and preservation of unrelated body
     content, checklist states, title, labels, assignees, milestone, and metadata.
@@ -84,8 +95,10 @@ Use `github-issue-creator` for new Issues, requirement-to-Issue drafting, or spl
 
 ## Batch reporting
 
-Report the target count and counts for `UPDATE`, `NO_CHANGE`, `REVIEW_REQUIRED`, and `BLOCKED`.
-List each target and its outcome; link and summarize updates, and give a reason for each skipped or blocked Issue.
+Report the requested scope, frozen unique Issue count, excluded PR count, processed and unprocessed counts,
+and counts for `UPDATE`, `NO_CHANGE`, `REVIEW_REQUIRED`, and `BLOCKED`. List each target and its outcome;
+link and summarize updates, and give a reason for each excluded, skipped, or blocked item. If collection was
+incomplete, report the retrieved count and uncollected range/count (or that it is unknown).
 Do not count a planned change as completed until it has been fetched back and verified.
 
 ## Shared quality rules
