@@ -59,10 +59,11 @@ Use `github-issue-creator` for new Issues, requirement-to-Issue drafting, or spl
 6. **Protect information and progress.** Prepare each edit from the captured Issue body; do not rebuild it from a blank template.
    Preserve unrequested requirements, decisions, scope, exclusions, constraints, dependencies, links, checklist states,
    title, labels, assignees, milestone, and metadata. Move content only if its meaning, conditions, and exceptions remain intact.
-   - Mark a task complete only with objective evidence. Keep partial, unverified, and incomplete work distinct.
-     Code presence, a merged PR, or a test for only part of a criterion does not prove completion.
-   - Preserve checked items unless reliable evidence shows they are wrong. Do not check unverified work or reset checked work
-     without evidence. Explain obsolete work rather than deleting it when its history matters.
+   - Distinguish implemented, verified, and incomplete work. Code presence, a merged PR, or a test for only part of a
+     criterion does not prove completion.
+   - Preserve captured checkbox states. Change a state only on an explicit request to change it or with objective
+     evidence. If an AC has no state to preserve and its status is unknown, leave it unchecked. Explain obsolete work
+     rather than deleting it when its history matters.
 7. **Use the standard format.** A required template in the target repository takes precedence.
    Otherwise, reuse the canonical `github-issue-creator/references/issue-template.md` from this SKILLS package when accessible.
    If the refiner is installed alone and that file is unavailable, use these headings without creating another template file
@@ -104,6 +105,15 @@ Do not count a planned change as completed until it has been fetched back and ve
 ## Shared quality rules
 
 - State what outcome is needed, why it matters, important constraints, and observable completion conditions.
+- Under `## 完了条件（Acceptance Criteria）` (or the required equivalent), use GitHub task-list checkboxes (`- [ ]` or
+  `- [x]`), one objectively verifiable AC per box. Do not use plain bullets for ACs or mix work steps with outcomes.
+- For content updates, use checkboxes for new or changed ACs and leave out-of-scope text and AC formatting untouched.
+  During explicit format normalization, convert plain AC bullets to `- [ ]`, preserve existing checked states and all
+  conditions/exceptions, and remove only duplicate equivalent criteria with compatible checked states. If duplicate
+  states conflict, preserve them for review. Do not merge distinct ACs or add/remove criteria without a request or
+  confirmed evidence.
+- Apply these rules only to explicitly targeted `UPDATE` Issues in a batch. Do not rewrite `NO_CHANGE` Issues or start
+  bulk edits solely for checkbox style unless normalization was requested.
 - Keep each bullet to one point; remove repetition and filler without losing conditions, exceptions, or decision rationale.
 - Keep subtasks actionable and acceptance criteria verifiable. Leave unknown facts and unverified progress explicit.
 - Do not invent labels, milestones, priorities, requirements, or implementation results.
